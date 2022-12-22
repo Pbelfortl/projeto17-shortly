@@ -3,7 +3,7 @@ import urlSchema from "../schemas/urlSchema.js"
 import  jwt  from "jsonwebtoken"
 
 
-export async function validateToken (req, res, next) {
+export async function validateUrl(req, res, next) {
 
     const {authorization} = req.headers
     const {url} = req.body
@@ -28,7 +28,7 @@ export async function validateToken (req, res, next) {
     
 }
 
-export async function validateMyUrls (req, res, next) {
+export async function validateToken (req, res, next) {
 
     const {authorization} = req.headers
     const token = authorization?.replace("Bearer ", "")
@@ -37,11 +37,12 @@ export async function validateMyUrls (req, res, next) {
         const user = jwt.verify(token, process.env.TOKEN_KEY)
         //const user = await connection.query("SELECT * FROM sessions WHERE token = $1", [token])
         req.data = {userId:user.userId,email:user.email}
-        next()
+        
 
     } catch (err){
         console.log(err)
         res.status(401).send(err)
     }
     
+    next()
 }
