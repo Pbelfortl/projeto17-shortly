@@ -32,7 +32,6 @@ export async function getUrl (req, res){
 export async function getMine (req, res) {
 
     const {userId} = req.data
-    console.log(userId)
 
     try {
 
@@ -56,22 +55,37 @@ export async function openUrl (req, res) {
     const shortUrl = req.params.shortUrl
 
     try{
-        const url = (await connection.query(`SELECT * FROM urls WHERE "shortUrl" = $1`, [shortUrl])).rows
-        console.log(url[0].url)
+        const url = (await connection.query(`SELECT * FROM urls WHERE "shortUrl" = $1`, [shortUrl])).rows[0]
+
+        console.log(url)
         if (!url) {
             return res.senStatus(404)
         }
 
         await connection.query(`UPDATE urls SET "visitCount" = "visitCount"+1 WHERE id = $1`, [url.id])
 
-        res.redirect(url[0].url)
+        res.redirect(url.url)
 
     } catch (err) {
+        console.log(err)
         res.status(500).send(err)
     }
 }
 
 export async function deleteUrl (req, res) {
+
+    const {userId, email} = req.data
+    const urlId = req.data.urlId
+    
+    try {
+
+        await connection.query(`DELETE FROM urls WHERE id = $1`, [urlId])
+        res.sendStatus(200)
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).send(err)
+    }
 
 }
 

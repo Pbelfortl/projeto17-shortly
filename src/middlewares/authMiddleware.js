@@ -7,20 +7,26 @@ export async function signUpValidation(req, res, next) {
 
     const user = req.body
 
-    const alreadyRegistered = await connection.query("SELECT * FROM users WHERE email = $1", [user.email])
-    const userValidation = signUpSchema.validate(user)
+    try{
+            const alreadyRegistered = await connection.query("SELECT * FROM users WHERE email = $1", [user.email])
+        const userValidation = signUpSchema.validate(user)
 
-    if (userValidation.error) {
-        return res.sendStatus(422)
+        if (userValidation.error) {
+            return res.sendStatus(422)
+        }
+
+        if (alreadyRegistered.rowCount > 0) {
+            return res.sendStatus(409)
+        }
+
+        req.user = user
+
+        next()
+    } catch (err) {
+        console.log(err)
+        res.sendStatus(500)
     }
-
-    if (alreadyRegistered.rowCount > 0) {
-        return res.sendStatus(409)
-    }
-
-    req.user = user
-
-    next()
+    
 }
 
 export async function singInValidation(req, res, next) {
@@ -34,7 +40,7 @@ export async function singInValidation(req, res, next) {
 
     try {
         const checkUser = (await connection.query("SELECT * FROM users WHERE email=$1", [email])).rows[0]
-
+        console.log(checkUser)
         if (!checkUser){
 
             return res.sendStatus(401)
@@ -47,12 +53,11 @@ export async function singInValidation(req, res, next) {
         }
 
         req.user = checkUser
+        next()
 
     } catch (err) {
         console.log(err)
         res.status(500).send(err)
-    }
+    }   
     
-    
-    next()
 }

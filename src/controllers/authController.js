@@ -30,7 +30,7 @@ export async function signIn (req, res) {
 
         res.status(200).send(token)
     } catch (err) {
-        console.log(err)
+
         res.status(500).send(err)
     }
 }

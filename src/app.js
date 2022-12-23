@@ -9,11 +9,8 @@ dotenv.config()
 
 const { Pool } = pg
 export const connection = new Pool({
-    user: "postgres",
-    host: "localhost",
-    port: 5432,
-    database: "shortly",
-    password: "root",
+    connectionString: process.env.DATABASE_URL,
+    ssl: true
 })
 
 const app = express()
